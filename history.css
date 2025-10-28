@@ -1,0 +1,191 @@
+/* ===== Global Dark Theme ===== */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #0f0f10;
+    color: #eaeaea;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* ===== Top Bar ===== */
+.top-bar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #18181a;
+    padding: 15px 0;
+    border-bottom: 1px solid #333;
+    gap: 40px;
+}
+
+.top-bar .brand {
+    font-size: 1.4em;
+    font-weight: 700;
+    background: linear-gradient(45deg, #ff69b4, #8a2be2);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-decoration: none;
+}
+
+.top-bar a:not(.brand) {
+    text-decoration: none;
+    color: #fff;
+    font-weight: 500;
+    transition: color 0.3s ease;
+    font-size: 1em;
+}
+
+.top-bar a:not(.brand):hover {
+    color: #ff69b4;
+}
+
+/* ===== Task Table Section ===== */
+.taskTable {
+    text-align: center;
+    margin-top: 40px;
+    flex: 1;
+}
+.taskTable h2 {
+    margin-bottom: 20px;
+    color: #ff69b4;
+    font-size: 1.6em;
+}
+/* ===== Table Styling ===== */
+.tasks-table {
+    width: 90%;
+    margin: 40px auto;
+    overflow-x: auto;
+}
+
+.tasks-table table {
+    width: 100%;
+    border-collapse: collapse;
+    border: 1px solid #333;
+    text-align: center;
+}
+
+.tasks-table th,
+.tasks-table td {
+    border: 1px solid #444;
+    padding: 10px;
+}
+
+.tasks-table th {
+    background-color: #1a1a1c;
+    color: #ff69b4;
+    font-weight: 600;
+}
+
+.tasks-table tr:hover td {
+    background-color: #1e1e1f;
+}
+
+/* ===== Mobile Task Cards ===== */
+.mobile-task-cards {
+    display: none;
+    width: 95%;
+    margin: 20px auto;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.task-card-item {
+    background-color: #1e1e1f;
+    border: 1px solid #333;
+    border-radius: 12px;
+    padding: 15px;
+    box-shadow: 0 0 8px rgba(255, 105, 180, 0.2);
+    color: #fff;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    text-align: left;
+}
+
+.task-card-item:hover {
+    transform: scale(1.02);
+    box-shadow: 0 0 12px rgba(138, 43, 226, 0.3);
+}
+
+.task-card-item h3 {
+    color: #ff69b4;
+    margin-bottom: 8px;
+    font-size: 1.1em;
+}
+
+.task-card-item p {
+    margin: 5px 0;
+    font-size: 0.95em;
+}
+
+/* ===== Card Buttons ===== */
+.card-buttons {
+    margin-top: 15px;
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+}
+
+.card-buttons button {
+    padding: 8px 14px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: opacity 0.3s ease;
+    min-width: 90px;
+}
+
+.card-buttons .doneTaskBtn {
+    background-color: #4CAF50;
+    color: #fff;
+}
+
+.card-buttons .deleteTaskBtn {
+    background-color: #ff4d4d;
+    color: #fff;
+}
+
+.card-buttons button:hover {
+    opacity: 0.8;
+}
+
+/* ===== Footer ===== */
+.footer {
+    background-color: #18181a;
+    text-align: center;
+    padding: 10px 0;
+    border-top: 1px solid #333;
+    width: 100%;
+    margin-top: auto;
+}
+
+.footer a {
+    color: #8a2be2;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.footer a:hover {
+    color: #ff69b4;
+}
+
+.footer .rights {
+    font-size: 0.9em;
+    color: #ccc;
+}
+
+@media (max-width: 768px) {
+    .top-bar {
+        flex-wrap: wrap;
+        gap: 20px;
+        padding: 15px 10px;
+    }
+    .mobile-task-cards {
+        display: flex;
+    }
+    .tasks-table {
+        display: none !important;
+    }
+}

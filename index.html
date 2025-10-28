@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartList</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+</head>
+
+<body>
+    <div class="top-bar">
+        <a class="brand" href="#home">SmartList</a>
+        <a href="history.html">View History</a>
+        <a href="teamslister1.html">About Us</a>
+        <a href="#account">Account</a>
+    </div>
+
+    <!-- Add New Task -->
+    <section class="task-section" id="home">
+        <div class="taskTable">
+            <h2>Add New Task</h2>
+
+            <div class="inputRow">
+                <input type="text" placeholder="Activity Name" required>
+                <select>
+                    <option value="select">Choose a Subject</option>
+                    <option value="eapp">English for Academic and Professional Purposes</option>
+                    <option value="philosophy">Philosophy</option>
+                    <option value="ucsp">Understanding Culture, Society, and Politics</option>
+                    <option value="pr">Practical Research</option>
+                    <option value="filipino">Filipino</option>
+                    <option value="ict">Information and Communications Technology</option>
+                    <option value="hope">HOPE</option>
+                    <option value="others">Others</option>
+                </select>
+                <input type="text" placeholder="Subject Name">
+                <input type="date" required>
+                <button onclick="add()">Add</button>
+            </div>
+
+            <div class="tasks-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Tasks</th>
+                            <th>Subject</th>
+                            <th>Deadline</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            <div id="taskCardsContainer" class="mobile-task-cards"></div>
+        </div>
+    </section>
+
+    <!-- Account Section -->
+    <section class="account" id="account">
+        <div class="account-container">
+            <h2>User Account</h2>
+
+            <div class="profile-section">
+                <div class="profile-pic-container">
+                    <img src="" alt="Profile Picture" class="profile-pic" id="profilePic">
+                    <input type="file" id="uploadProfilePic" accept="image/*" style="display: none;">
+                    <button id="changePicBtn">Change Picture</button>
+                </div>
+                <div class="profile-info">
+                    <p><span id="userName"></span></p>
+                </div>
+            </div>
+
+            <div class="task-stats">
+                <div class="task-card done">
+                    <h3>Tasks Done</h3>
+                    <p id="tasksDone"></p>
+                </div>
+
+                <div class="task-card ongoing">
+                    <h3>Ongoing Tasks</h3>
+                    <p id="tasksOngoing"></p>
+                </div>
+            </div>
+
+            <div class="account-actions">
+                <button id="logoutBtn" class="logout">Logout</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <div class="footer">
+        <footer class="rights">
+            <a href="terms.html">Terms & Services |</a>
+            <a href="copyright.html">Copyright |</a>
+            <a href="privacy.html">Privacy</a>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,475 @@
+/* ===== Global Dark Theme ===== */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #0f0f10;
+    color: #eaeaea;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* ===== Top Bar (Equal Padding) ===== */
+.top-bar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #18181a;
+    padding: 15px 0;
+    border-bottom: 1px solid #333;
+    gap: 40px;
+}
+
+/* Gradient text for SmartList brand */
+.top-bar .brand {
+    font-size: 1.4em;
+    font-weight: 700;
+    background: linear-gradient(45deg, #ff69b4, #8a2be2);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-decoration: none;
+}
+
+/* Navigation links */
+.top-bar a:not(.brand) {
+    text-decoration: none;
+    color: #fff;
+    font-weight: 500;
+    transition: color 0.3s ease;
+    font-size: 1em;
+}
+
+.top-bar a:not(.brand):hover {
+    color: #ff69b4;
+}
+
+/* ===== Task Section ===== */
+.task-section {
+    text-align: center;
+    margin-top: 40px;
+}
+
+.task-section h2 {
+    margin-bottom: 20px;
+    color: #ff69b4;
+}
+
+/* Input Row */
+.inputRow {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: nowrap;
+}
+
+.inputRow input,
+.inputRow select,
+.inputRow button {
+    padding: 8px 10px;
+    border: 1px solid #333;
+    border-radius: 6px;
+    background-color: #1e1e1f;
+    color: #fff;
+    font-size: 0.95em;
+    outline: none;
+}
+
+.inputRow input:focus,
+.inputRow select:focus {
+    border-color: #8a2be2;
+}
+
+.inputRow button {
+    background-color: #8a2be2;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.inputRow button:hover {
+    background-color: #ff69b4;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: brightness(0) invert(1);
+    cursor: pointer;
+    opacity: 0.8;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator:hover {
+    opacity: 1;
+}
+
+
+/* ===== Table Styling ===== */
+.tasks-table {
+    width: 90%;
+    margin: 40px auto;
+    overflow-x: auto;
+}
+
+.tasks-table select {
+    margin-bottom: 10px;
+    padding: 6px;
+    background-color: #1e1e1f;
+    color: #fff;
+    border: 1px solid #333;
+    border-radius: 4px;
+}
+
+.tasks-table table {
+    width: 100%;
+    border-collapse: collapse;
+    border: 1px solid #333;
+    text-align: center;
+}
+
+.tasks-table th,
+.tasks-table td {
+    border: 1px solid #444;
+    padding: 10px;
+}
+
+.tasks-table th {
+    background-color: #1a1a1c;
+    color: #ff69b4;
+}
+
+/* ===== Mobile Task Cards ===== */
+.mobile-task-cards {
+    display: none;
+    width: 95%;
+    margin: 20px auto;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.task-card-item {
+    background-color: #1e1e1f;
+    border: 1px solid #333;
+    border-radius: 12px;
+    padding: 15px;
+    box-shadow: 0 0 8px rgba(255, 105, 180, 0.2);
+    color: #fff;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    text-align: left;
+    /* ✅ Align text left */
+}
+
+.task-card-item:hover {
+    transform: scale(1.02);
+    box-shadow: 0 0 12px rgba(138, 43, 226, 0.3);
+}
+
+.task-card-item h3 {
+    color: #ff69b4;
+    margin-bottom: 8px;
+    font-size: 1.1em;
+}
+
+.task-card-item p {
+    margin: 5px 0;
+    font-size: 0.95em;
+    color: #eaeaea;
+}
+
+/* ✅ Center buttons horizontally */
+.card-buttons {
+    margin-top: 15px;
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+}
+
+.card-buttons button {
+    padding: 8px 14px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: opacity 0.3s ease;
+    min-width: 90px;
+}
+
+.card-buttons .doneTaskBtn {
+    background-color: #8a2be2;
+    color: #fff;
+}
+
+.card-buttons .deleteTaskBtn {
+    background-color: #ff4d4d;
+    color: #fff;
+}
+
+.card-buttons button:hover {
+    opacity: 0.8;
+}
+
+/* ===== Account Section ===== */
+.account {
+    margin-top: 50px;
+    text-align: center;
+    color: #fff;
+    min-height: 150px;
+    padding: 40px 20px;
+}
+
+.account-container {
+    background-color: #18181a;
+    border: 1px solid #333;
+    border-radius: 12px;
+    max-width: 700px;
+    margin: auto;
+    padding: 30px;
+    box-shadow: 0 0 10px rgba(138, 43, 226, 0.3);
+}
+
+/* Header */
+.account-container h2 {
+    color: #ff69b4;
+    margin-bottom: 25px;
+    font-size: 1.6em;
+}
+
+/* Profile Section */
+.profile-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+/* Profile Picture */
+.profile-pic-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.profile-pic {
+    width: 130px;
+    height: 130px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #8a2be2;
+    background-color: #1e1e1f;
+    margin-bottom: 10px;
+    transition: transform 0.3s ease;
+}
+
+.profile-pic:hover {
+    transform: scale(1.05);
+}
+
+#changePicBtn {
+    background: linear-gradient(45deg, #8a2be2, #ff69b4);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 6px 12px;
+    cursor: pointer;
+    transition: opacity 0.3s ease;
+}
+
+#changePicBtn:hover {
+    opacity: 0.8;
+}
+
+/* Profile Info */
+.profile-info {
+    text-align: center;
+}
+
+.profile-info p {
+    margin: 10px 0 0;
+    font-size: 1.1em;
+    color: #eaeaea;
+}
+
+/* Task Counters */
+.task-stats {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    gap: 30px;
+    margin-bottom: 30px;
+}
+
+.task-card {
+    background-color: #1e1e1f;
+    border: 1px solid #333;
+    border-radius: 10px;
+    padding: 20px 25px;
+    width: 45%;
+    min-width: 200px;
+    box-shadow: 0 0 10px rgba(255, 105, 180, 0.2);
+}
+
+.task-card h3 {
+    color: #ff69b4;
+    margin-bottom: 10px;
+    font-size: 1.1em;
+}
+
+.task-card p {
+    font-size: 1.6em;
+    font-weight: bold;
+    color: #fff;
+}
+
+/* Account Actions */
+.account-actions {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.account-actions button {
+    padding: 10px 16px;
+    border-radius: 8px;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s ease, opacity 0.3s ease;
+}
+
+.account-actions .danger {
+    background-color: #ff4d4d;
+    color: #fff;
+}
+
+.account-actions .logout {
+    background: linear-gradient(45deg, #8a2be2, #ff69b4);
+    color: #fff;
+}
+
+.account-actions button:hover {
+    transform: scale(1.05);
+    opacity: 0.85;
+}
+
+/* ===== Footer ===== */
+.footer {
+    background-color: #18181a;
+    text-align: center;
+    padding: 10px 0;
+    border-top: 1px solid #333;
+    width: 100%;
+    margin-top: auto;
+}
+
+.footer a {
+    color: #8a2be2;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.footer a:hover {
+    color: #ff69b4;
+}
+
+.footer .rights {
+    font-size: 0.9em;
+    color: #ccc;
+}
+
+/* ===== Responsive Adjustments ===== */
+@media (max-width: 768px) {
+    .top-bar {
+        flex-wrap: wrap;
+        gap: 20px;
+        padding: 15px 10px;
+    }
+
+    .inputRow {
+        flex-wrap: wrap;
+        width: 95%;
+        margin: auto;
+    }
+
+    .tasks-table {
+        width: 95%;
+    }
+}
+
+@media (max-width: 600px) {
+    .top-bar {
+        flex-wrap: wrap;
+        gap: 15px;
+        padding: 10px 5px;
+    }
+
+    .top-bar a {
+        font-size: 0.9em;
+    }
+
+    .top-bar .home {
+        font-size: 0.5em;
+    }
+
+    .inputRow {
+        flex-direction: column;
+        align-items: center;
+        width: 90%;
+        margin: 0 auto;
+        gap: 12px;
+    }
+
+    .inputRow input,
+    .inputRow select,
+    .inputRow button {
+        width: 100%;
+        max-width: 400px;
+        font-size: 1em;
+        box-sizing: border-box;
+    }
+
+    .inputRow input,
+    .inputRow select {
+        padding: 10px;
+        border-radius: 6px;
+        background-color: #1e1e1f;
+        border: 1px solid #333;
+        color: #fff;
+    }
+
+    .inputRow button {
+        background: linear-gradient(45deg, #8a2be2, #ff69b4);
+        font-weight: bold;
+        padding: 12px;
+        border: none;
+        border-radius: 8px;
+        color: #fff;
+        cursor: pointer;
+        transition: opacity 0.3s ease;
+    }
+
+    .inputRow button:hover {
+        opacity: 0.85;
+    }
+
+    .task-stats {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .task-card {
+        width: 100%;
+    }
+
+    .tasks-table {
+        width: 95%;
+    }
+}
+
+@media (max-width: 768px) {
+    .mobile-task-cards {
+        display: flex;
+    }
+
+    .tasks-table {
+        display: none !important;
+    }
+}

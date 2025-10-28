@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Team Slister | About Us</title>
+    <meta name="description" content="Meet Team Slister - The team behind SmartList, the ultimate task manager." />
+
+    <style>
+        /* ===== Global Dark Theme ===== */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #0f0f10;
+            color: #eaeaea;
+            min-height: 100vh;
+        }
+
+        /* ===== Container ===== */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 3rem 1rem 5rem;
+        }
+
+        /* ===== Header ===== */
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+
+        .back-button {
+            position: absolute;
+            left: 0;
+            top: 0;
+            background-color: #18181a;
+            border: 1px solid #333;
+            color: #ff69b4;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .back-button:hover {
+            background: linear-gradient(45deg, #8a2be2, #ff69b4);
+            color: #fff;
+        }
+
+        h1 {
+            font-size: clamp(2.5rem, 7vw, 4rem);
+            font-weight: 800;
+            background: linear-gradient(45deg, #ff69b4, #8a2be2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.75rem;
+        }
+
+        .tagline {
+            font-size: 1.1rem;
+            color: #ccc;
+        }
+
+        /* ===== Team Grid ===== */
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        /* ===== Team Card ===== */
+        .team-card {
+            background-color: #1e1e1f;
+            border: 1px solid #333;
+            border-radius: 1rem;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 0 12px rgba(255, 105, 180, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .team-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 0 20px rgba(138, 43, 226, 0.4);
+            border-color: #8a2be2;
+        }
+
+        /* Profile Image */
+        .profile-image {
+            width: 9rem;
+            height: 9rem;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #8a2be2;
+            margin-bottom: 1rem;
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+
+        .team-card:hover .profile-image {
+            transform: scale(1.08);
+            border-color: #ff69b4;
+        }
+
+        /* Member Info */
+        .member-name {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 0.25rem;
+        }
+
+        .member-role {
+            color: #ff69b4;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .member-description {
+            font-size: 0.95rem;
+            color: #ccc;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        /* Social Links */
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .social-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.8rem;
+            height: 2.8rem;
+            border-radius: 50%;
+            border: 1px solid #333;
+            color: #ff69b4;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .social-link:hover {
+            background: linear-gradient(45deg, #8a2be2, #ff69b4);
+            color: #fff;
+            transform: scale(1.1);
+        }
+
+        .icon {
+            width: 1.3rem;
+            height: 1.3rem;
+            stroke: currentColor;
+            stroke-width: 2;
+            fill: none;
+        }
+
+        /* ===== Footer ===== */
+        footer {
+            background-color: #18181a;
+            text-align: center;
+            padding: 1rem;
+            border-top: 1px solid #333;
+            color: #ccc;
+            margin-top: 3rem;
+        }
+
+        footer a {
+            color: #8a2be2;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        footer a:hover {
+            color: #ff69b4;
+        }
+
+        /* ===== Responsive ===== */
+        @media (max-width: 640px) {
+            .container {
+                padding: 1.5rem 1rem 3rem;
+            }
+
+            header {
+                margin-bottom: 2rem;
+            }
+
+            .back-button {
+                position: static;
+                width: 100%;
+                text-align: center;
+                margin-bottom: 1rem;
+            }
+
+            .profile-image {
+                width: 7rem;
+                height: 7rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <a href="index.html#home" class="back-button">Back to Home</a>
+            <h1>Team Slister</h1>
+            <p class="tagline">The creative minds behind the SmartList experience.</p>
+        </header>
+
+        <main class="team-grid">
+            <!-- Member 1 -->
+            <article class="team-card">
+                <img src="img_3.jpg" alt="Cyron Sadia - Web Developer" class="profile-image">
+                <h2 class="member-name">Cyron Sadia</h2>
+                <h3 class="member-role">Web Developer</h3>
+                <p class="member-description">Lead developer handling core functionalities and backend integration for
+                    SmartList.</p>
+                <div class="social-links">
+                    <a href="https://www.facebook.com/sadia.cyron" target="_blank" class="social-link">
+                        <svg class="icon" viewBox="0 0 24 24">
+                            <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
+                        </svg>
+                    </a>
+                    <a href="https://www.instagram.com/kyo4naru" target="_blank" class="social-link">
+                        <svg class="icon" viewBox="0 0 24 24">
+                            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                        </svg>
+                    </a>
+                </div>
+            </article>
+
+            <!-- Member 2 -->
+            <article class="team-card">
+                <img src="img_2.jpg" alt="Andrea Shane Reyes - UI Designer" class="profile-image">
+                <h2 class="member-name">Andrea Shane Reyes</h2>
+                <h3 class="member-role">UI Designer</h3>
+                <p class="member-description">Designs intuitive and visually stunning user interfaces for SmartList.</p>
+                <div class="social-links">
+                    <a href="https://www.facebook.com/iloveyouuhanna" target="_blank" class="social-link">
+                        <svg class="icon" viewBox="0 0 24 24">
+                            <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
+                        </svg>
+                    </a>
+                    <a href="https://www.instagram.com/sh.zyana" target="_blank" class="social-link">
+                        <svg class="icon" viewBox="0 0 24 24">
+                            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                        </svg>
+                    </a>
+                </div>
+            </article>
+
+            <!-- Member 3 -->
+            <article class="team-card">
+                <img src="img_1.jpg" alt="Sheena Ubana - Project Manager" class="profile-image">
+                <h2 class="member-name">Sheena Ubana</h2>
+                <h3 class="member-role">Project Manager</h3>
+                <p class="member-description">Oversees milestones and ensures smooth collaboration across all
+                    development stages.</p>
+                <div class="social-links">
+                    <a href="https://www.facebook.com/sheenameridoresubana" target="_blank" class="social-link">
+                        <svg class="icon" viewBox="0 0 24 24">
+                            <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
+                        </svg>
+                    </a>
+                    <a href="https://www.instagram.com/clou_di3" target="_blank" class="social-link">
+                        <svg class="icon" viewBox="0 0 24 24">
+                            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                        </svg>
+                    </a>
+                </div>
+            </article>
+
+            <!-- Member 4 -->
+            <article class="team-card">
+                <img src="img_4.jpg" alt="Chris Jerome Magpayo - UX Designer" class="profile-image">
+                <h2 class="member-name">Chris Jerome Magpayo</h2>
+                <h3 class="member-role">UX Designer</h3>
+                <p class="member-description">Focuses on improving SmartList’s usability and enhancing user experience.
+                </p>
+                <div class="social-links">
+                    <a href="https://www.facebook.com/chrisjerome.magpayo.7" target="_blank" class="social-link">
+                        <svg class="icon" viewBox="0 0 24 24">
+                            <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
+                        </svg>
+                    </a>
+                    <a href="https://www.instagram.com/vxyjeroo4" target="_blank" class="social-link">
+                        <svg class="icon" viewBox="0 0 24 24">
+                            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                        </svg>
+                    </a>
+                </div>
+            </article>
+        </main>
+    </div>
+
+    <footer>
+        <p class="rights">© 2025 Team Slister. Built for <a href="index.html">SmartList</a>.</p>
+    </footer>
+</body>
+
+</html>

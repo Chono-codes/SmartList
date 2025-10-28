@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="style2.css">
+    <title>Login</title>
+</head>
+
+<body>
+    <div>
+        <h2>Welcome back!</h2>
+
+        <div>
+            <label for="login-email">Email</label><br>
+            <input type="email" id="login-email" name="login-email" required
+                pattern="^[a-zA-Z0-9._%+-]{5,}@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$" placeholder="Enter your email."><br>
+
+            <label for="login-password">Password</label><br>
+            <input type="password" id="login-password" name="login-password" required
+                pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$"
+                placeholder="Enter your password."><br>
+
+            <label><input type="checkbox" id="toggleLoginPassword"> Show Password</label><br>
+
+            <button type="submit">Sign In</button>
+            <p>Don't have an account? <a href="sign-up.html">Sign Up</a></p>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = "https://niggfzjuhumefvdhhbms.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5pZ2dmemp1aHVtZWZ2ZGhoYm1zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE2MzYzNjcsImV4cCI6MjA3NzIxMjM2N30.RfYeNCXNzczWU3DrjvZ7MBea4UoTqAIVXIQ03pnG2F0";
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        const emailInput = document.getElementById("login-email");
+        const passwordInput = document.getElementById("login-password");
+        const togglePassword = document.getElementById("toggleLoginPassword");
+
+        // Toggle password visibility
+        togglePassword.addEventListener("change", () => {
+            passwordInput.type = togglePassword.checked ? "text" : "password";
+        });
+
+        // Login handler
+        async function login() {
+            const email = emailInput.value.trim();
+            const password = passwordInput.value;
+
+            // Basic validation
+            if (!email) {
+                alert("Please enter your email.");
+                return;
+            }
+
+            if (!password) {
+                alert("Please enter your password.");
+                return;
+            }
+
+            try {
+                const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+                if (error) throw error;
+
+                alert("Logged in successfully!");
+                window.location.href = "index.html"; // Redirect after login
+            } catch (err) {
+                console.error(err);
+                alert("Login failed. Check your credentials.");
+            }
+        }
+
+        // Attach login function to button
+        document.querySelector('button[type="submit"]').addEventListener("click", (e) => {
+            e.preventDefault();
+            login();
+        });
+    </script>
+</body>
+
+</html>

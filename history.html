@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="history.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <title>Task History</title>
+</head>
+
+<body>
+    <div class="top-bar">
+        <a class="brand" href="index.html#home">SmartList</a>
+        <a href="#history">View History</a>
+        <a href="teamslister1.html">About Us</a>
+        <a href="index.html#account">Account</a>
+    </div>
+
+    <div class="taskTable">
+        <h2>Task History</h2>
+
+        <div class="tasks-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Tasks</th>
+                        <th>Subject</th>
+                        <th>Deadline</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <div id="taskCardsContainer" class="mobile-task-cards"></div>
+    </div>
+
+    <div class="footer">
+        <footer class="rights">
+            <a href="terms.html">Terms & Services |</a>
+            <a href="copyright.html">Copyright |</a>
+            <a href="privacy.html">Privacy</a>
+        </footer>
+    </div>
+
+    <script src="history.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <link rel="stylesheet" href="style2.css">
+    <title>Sign Up</title>
+
+    <style>
+
+    </style>
+</head>
+
+<body>
+    <div>
+        <h1>Welcome to SmartList MVP</h1>
+
+        <h2>Create an account</h2>
+
+        <div>
+            <div>
+                <label for="email">Email</label><br>
+                <input type="email" id="email" name="email" required
+                    pattern="^[a-zA-Z0-9._%+-]{5,}@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$" placeholder="Enter your email."><br>
+
+                <label for="password">Password</label><br>
+                <input type="password" id="password" name="password" required
+                    pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$"
+                    placeholder="Must contain at least 8 characters, including uppercase, lowercase, number, and special symbol."><br>
+
+                <label for="confirm-password">Confirm Password</label><br>
+                <input type="password" id="confirm-password" name="confirm-password" required
+                    pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$"
+                    placeholder="Re-enter your password."><br>
+
+                <label><input type="checkbox" id="togglePassword"> Show Password</label><br>
+
+                <button type="button" onclick="submitForm()">Sign Up</button>
+                <p>Already have an account? <a href="sign-in.html">Login</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = "https://niggfzjuhumefvdhhbms.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5pZ2dmemp1aHVtZWZ2ZGhoYm1zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE2MzYzNjcsImV4cCI6MjA3NzIxMjM2N30.RfYeNCXNzczWU3DrjvZ7MBea4UoTqAIVXIQ03pnG2F0";
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // Toggle password visibility
+        document.getElementById("togglePassword").addEventListener("change", function () {
+            const type = this.checked ? "text" : "password";
+            document.getElementById("password").type = type;
+            document.getElementById("confirm-password").type = type;
+        });
+
+        // Sign up handler
+        async function submitForm() {
+            const email = document.getElementById("email").value.trim();
+            const password = document.getElementById("password").value;
+            const confirm = document.getElementById("confirm-password").value;
+
+            // === BASIC VALIDATION ===
+            if (!email) {
+                alert("Please enter an email address.");
+                return;
+            }
+
+            if (password.length < 8) {
+                alert("Password must be at least 8 characters long.");
+                return;
+            }
+
+            if (password !== confirm) {
+                alert("Passwords do not match!");
+                return;
+            }
+
+            // ======== SIGN UP & AUTO LOGIN (NO CONFIRMATION EMAIL) ========
+            const { data, error } = await supabase.auth.signUp({
+                email,
+                password,
+                options: {
+                    emailRedirectTo: window.location.origin + "/index.html", // optional redirect
+                    data: { skip_confirm: true } // optional metadata
+                }
+            });
+
+            if (error) {
+                console.error(error);
+                alert("Sign-up failed: " + error.message);
+                return;
+            }
+
+            // Immediately sign in (if not automatically logged in)
+            const session = data.session || (await supabase.auth.signInWithPassword({ email, password })).data.session;
+
+            if (!session) {
+                alert("Something went wrong during auto login. Try signing in manually.");
+                window.location.href = "sign-in.html";
+                return;
+            }
+
+            alert("Account created and logged in!");
+            window.location.href = "index.html";
+        }
+    </script>
+</body>
+
+</html>
