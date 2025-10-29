@@ -162,10 +162,10 @@ $(document).on('change', '#uploadProfilePic', async function (event) {
         if (updateError) throw updateError;
 
         $('#profilePic').attr('src', publicUrl);
-        alert('✅ Profile picture updated successfully!');
+        alert('Profile picture updated successfully!');
     } catch (err) {
         console.error("Upload error:", err);
-        alert("❌ Upload failed — session or permission issue.");
+        alert("Upload failed — session or permission issue.");
     } finally {
         $('#uploadProfilePic').val('');
     }
@@ -312,6 +312,7 @@ $(document).on('change', '#uploadProfilePic', async function (event) {
     $(window).on('resize', loadTasks);
 
 });
+
 
 
 
