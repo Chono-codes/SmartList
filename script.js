@@ -113,7 +113,7 @@ $(document).ready(function () {
     });
     if (location.hash === '#account') getUser();
 
-   // ======== PROFILE PICTURE UPLOAD (FINAL FIX) ========
+  // ======== PROFILE PICTURE UPLOAD (WORKS IN WEB APP + BROWSER) ========
 $(document).on('click', '#changePicBtn', function () {
     $('#uploadProfilePic').click();
 });
@@ -122,48 +122,50 @@ $(document).on('change', '#uploadProfilePic', async function (event) {
     const file = event.target.files[0];
     if (!file) return;
 
-    const { data: { user }, error: userError } = await supabase.auth.getUser();
-    if (userError || !user) {
-        alert('Please log in first.');
-        return;
-    }
-
     try {
+        // ✅ Restore or refresh session manually (required for PWA)
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        if (sessionError) console.warn("Session refresh failed:", sessionError);
+        if (!session || !session.user) {
+            alert("You must be logged in to upload a profile picture.");
+            return;
+        }
+
+        const user = session.user;
         const fileExt = file.name.split('.').pop();
         const fileName = `${user.id}-${Date.now()}.${fileExt}`;
         const filePath = `avatars/${fileName}`;
 
-        // Upload file
+        // Upload with authentication
         const { data: uploadData, error: uploadError } = await supabase.storage
             .from('profile_pics')
             .upload(filePath, file, { upsert: true });
 
         if (uploadError) throw uploadError;
 
-        // --- FIXED PART ---
-        // Get the real public URL properly
-        const { data: publicUrlData, error: urlError } = await supabase
+        // Get real public URL
+        const { data: publicData, error: urlError } = await supabase
             .storage
             .from('profile_pics')
             .getPublicUrl(filePath);
 
         if (urlError) throw urlError;
 
-        const imageUrl = publicUrlData.publicUrl;
+        const publicUrl = publicData.publicUrl;
 
-        // Update database
+        // Update user record
         const { error: updateError } = await supabase
             .from('users')
-            .update({ profile_pic: imageUrl })
+            .update({ profile_pic: publicUrl })
             .eq('id', user.id);
 
         if (updateError) throw updateError;
 
-        $('#profilePic').attr('src', imageUrl);
-        alert('✅ Profile picture updated!');
+        $('#profilePic').attr('src', publicUrl);
+        alert('✅ Profile picture updated successfully!');
     } catch (err) {
-        console.error('Upload failed:', err);
-        alert('❌ Failed to upload image. Check console for details.');
+        console.error("Upload error:", err);
+        alert("❌ Upload failed — session or permission issue.");
     } finally {
         $('#uploadProfilePic').val('');
     }
@@ -310,5 +312,6 @@ $(document).on('change', '#uploadProfilePic', async function (event) {
     $(window).on('resize', loadTasks);
 
 });
+
 
 
