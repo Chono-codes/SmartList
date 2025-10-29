@@ -113,7 +113,7 @@ $(document).ready(function () {
     });
     if (location.hash === '#account') getUser();
 
-    // ======== PROFILE PICTURE UPLOAD ========
+    // ======== PROFILE PICTURE UPLOAD (FIXED FOR WEB APP + MOBILE) ========
     $(document).on('click', '#changePicBtn', function () {
         $('#uploadProfilePic').click();
     });
@@ -122,35 +122,51 @@ $(document).ready(function () {
         const file = event.target.files[0];
         if (!file) return;
 
-        const user = await getUser();
-        if (!user) return alert("You must be logged in.");
-
-        const fileExt = file.name.split('.').pop();
-        const fileName = `${user.id}-${Date.now()}.${fileExt}`;
-        const filePath = `profile-pics/${fileName}`;
+        const { data: { user }, error: userError } = await supabase.auth.getUser();
+        if (userError || !user) {
+            alert('Please log in first.');
+            return;
+        }
 
         try {
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${user.id}-${Date.now()}.${fileExt}`;
+            const filePath = `avatars/${fileName}`;
+
+            // Upload to Supabase storage bucket `profile_pics`
             const { error: uploadError } = await supabase.storage
-                .from('profile-pics')
+                .from('profile_pics')
                 .upload(filePath, file, { upsert: true });
 
             if (uploadError) throw uploadError;
 
-            const { data } = supabase.storage.from('profile-pics').getPublicUrl(filePath);
-            const imageUrl = data.publicUrl;
+            // Get public URL (works in PWA / installed mode)
+            const { data: publicData, error: urlError } = supabase
+                .storage
+                .from('profile_pics')
+                .getPublicUrl(filePath);
 
+            if (urlError) throw urlError;
+
+            const publicUrl = publicData.publicUrl;
+
+            // Update database
             const { error: updateError } = await supabase
                 .from('users')
-                .update({ profile_pic: imageUrl })
+                .update({ profile_pic: publicUrl })
                 .eq('id', user.id);
 
             if (updateError) throw updateError;
 
-            $('#profilePic').attr('src', imageUrl);
-            alert('Profile picture updated successfully!');
+            // Update UI
+            $('#profilePic').attr('src', publicUrl);
+            alert('✅ Profile picture updated successfully!');
         } catch (err) {
-            console.error(err);
-            alert('Failed to upload image.');
+            console.error('Upload failed:', err);
+            alert('❌ Failed to upload image.');
+        } finally {
+            // Reset input so next change always triggers event
+            $('#uploadProfilePic').val('');
         }
     });
 
@@ -295,3 +311,4 @@ $(document).ready(function () {
     $(window).on('resize', loadTasks);
 
 });
+
