@@ -5,22 +5,31 @@ $(document).ready(function () {
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5pZ2dmemp1aHVtZWZ2ZGhoYm1zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE2MzYzNjcsImV4cCI6MjA3NzIxMjM2N30.RfYeNCXNzczWU3DrjvZ7MBea4UoTqAIVXIQ03pnG2F0";
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+    // ======== RESTORE SESSION FOR MOBILE SAFETY ========
+    (async () => {
+        await supabase.auth.getSession();
+        supabase.auth.onAuthStateChange((_event, session) => {
+            if (session && session.user) {
+                console.log("Session active:", session.user.email);
+            }
+        });
+    })();
+
     // ======== CHECK AUTHENTICATION ========
     (async function checkAuth() {
         const { data: { user }, error } = await supabase.auth.getUser();
         if (error || !user) {
             window.location.href = 'sign-in.html';
         } else {
-            loadTasks(); // ✅ Load tasks when logged in
+            loadTasks();
         }
     })();
 
     // ======== LOGOUT FUNCTION ========
-    $('#logoutBtn').on('click', async function () {
+    $(document).on('click', '#logoutBtn', async function () {
         try {
             const { error } = await supabase.auth.signOut();
             if (error) throw error;
-
             alert('You have been logged out.');
             window.location.href = 'sign-in.html';
         } catch (err) {
@@ -62,6 +71,13 @@ $(document).ready(function () {
         showSectionById(currentHash || 'home');
     });
 
+    // ======== RESPONSIVE TABLE ========
+    function handleTableVisibility() {
+        window.innerWidth <= 768 ? $('.tasks-table').hide() : $('.tasks-table').show();
+    }
+    handleTableVisibility();
+    $(window).on('resize', handleTableVisibility);
+
     // ======== SUBJECT NAME TOGGLING ========
     const $subjectSelect = $('.taskTable select').eq(0);
     const $subjectNameInput = $('.taskTable input[type="text"]').eq(1);
@@ -70,18 +86,9 @@ $(document).ready(function () {
         $(this).val() === 'others' ? $subjectNameInput.fadeIn(200) : $subjectNameInput.hide();
     });
 
-    // ======== RESPONSIVE TABLE ========
-    function handleTableVisibility() {
-        window.innerWidth <= 768 ? $('.tasks-table').hide() : $('.tasks-table').show();
-    }
-    handleTableVisibility();
-    $(window).on('resize', handleTableVisibility);
-
-    // ======== LOAD CRYPTOJS FOR GRAVATAR ========
-    $.getScript("https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js");
-
     // ======== USER & PROFILE FUNCTIONS ========
     async function getUser() {
+        await supabase.auth.refreshSession(); // ensure valid on mobile
         const { data: { user }, error } = await supabase.auth.getUser();
         if (error || !user) {
             $('#userName').text('No user logged in.');
@@ -89,8 +96,8 @@ $(document).ready(function () {
             return null;
         }
         const { data: profile } = await supabase.from('users').select('*').eq('id', user.id).single();
-        let displayName = profile?.full_name || user.email;
-        let profilePic = profile?.profile_pic || getGravatarUrl(user.email);
+        const displayName = profile?.full_name || user.email;
+        const profilePic = profile?.profile_pic || getGravatarUrl(user.email);
         $('#userName').html(`<strong>${displayName}</strong>`);
         $('#profilePic').attr('src', profilePic);
         return user;
@@ -101,8 +108,51 @@ $(document).ready(function () {
         return `https://www.gravatar.com/avatar/${hash}?d=mp&s=200`;
     }
 
-    $(window).on('hashchange', function () { if (location.hash === '#account') getUser(); });
+    $(window).on('hashchange', function () {
+        if (location.hash === '#account') getUser();
+    });
     if (location.hash === '#account') getUser();
+
+    // ======== PROFILE PICTURE UPLOAD ========
+    $(document).on('click', '#changePicBtn', function () {
+        $('#uploadProfilePic').click();
+    });
+
+    $(document).on('change', '#uploadProfilePic', async function (event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const user = await getUser();
+        if (!user) return alert("You must be logged in.");
+
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${user.id}-${Date.now()}.${fileExt}`;
+        const filePath = `profile-pics/${fileName}`;
+
+        try {
+            const { error: uploadError } = await supabase.storage
+                .from('profile-pics')
+                .upload(filePath, file, { upsert: true });
+
+            if (uploadError) throw uploadError;
+
+            const { data } = supabase.storage.from('profile-pics').getPublicUrl(filePath);
+            const imageUrl = data.publicUrl;
+
+            const { error: updateError } = await supabase
+                .from('users')
+                .update({ profile_pic: imageUrl })
+                .eq('id', user.id);
+
+            if (updateError) throw updateError;
+
+            $('#profilePic').attr('src', imageUrl);
+            alert('Profile picture updated successfully!');
+        } catch (err) {
+            console.error(err);
+            alert('Failed to upload image.');
+        }
+    });
 
     // ======== ADD TASK ========
     window.add = async function () {
@@ -110,7 +160,10 @@ $(document).ready(function () {
         const subject = $subjectSelect.val();
         const subjectName = $subjectNameInput.val().trim();
         const date = $('.taskTable input[type="date"]').val();
-        if (!activity || subject === 'select' || !date) { alert('Fill all fields.'); return; }
+        if (!activity || subject === 'select' || !date) {
+            alert('Fill all fields.');
+            return;
+        }
 
         const subjectFullNames = {
             "ict": "Information and Communication Technology",
@@ -118,19 +171,37 @@ $(document).ready(function () {
             "science": "Science",
             "english": "English",
             "filipino": "Filipino",
-            "ucsp": "Understanding, Culture, Society, and Politics"
+            "ucsp": "Understanding Culture, Society, and Politics",
+            "eapp": "English for Academic and Professional Purposes",
+            "philosophy": "Philosophy",
+            "hope": "Health Optimizing Physical Education",
+            "pr": "Practical Research"
         };
         const finalSubject = subject === 'others' ? subjectName : (subjectFullNames[subject] || subject);
 
-        const user = await getUser(); if (!user) { alert('Login first.'); return; }
+        const user = await getUser();
+        if (!user) {
+            alert('Login first.');
+            return;
+        }
+
         try {
-            await supabase.from('tasks').insert([{ user_id: user.id, activity, subject: finalSubject, deadline: date, status: 'Ongoing' }]);
+            await supabase.from('tasks').insert([{
+                user_id: user.id,
+                activity,
+                subject: finalSubject,
+                deadline: date,
+                status: 'Ongoing'
+            }]);
             $('.taskTable input[type="text"]').val('');
             $('.taskTable select').val('select');
             $('.taskTable input[type="date"]').val('');
             $subjectNameInput.hide();
-            loadTasks(); // Refresh tasks & counters
-        } catch (err) { console.error(err); alert('Failed to add task.'); }
+            loadTasks();
+        } catch (err) {
+            console.error(err);
+            alert('Failed to add task.');
+        }
     };
 
     // ======== LOAD TASKS ========
@@ -149,10 +220,8 @@ $(document).ready(function () {
             return;
         }
 
-        // ✅ TASK COUNTERS
         const doneCount = tasks.filter(t => t.status === 'Done').length;
         const ongoingCount = tasks.filter(t => t.status === 'Ongoing').length;
-
         $('#tasksDone').text(doneCount);
         $('#tasksOngoing').text(ongoingCount);
 
@@ -170,12 +239,8 @@ $(document).ready(function () {
         const today = new Date().toISOString().split('T')[0];
 
         tasks.forEach(task => {
-            let statusColor = '';
-            if (task.status === 'Ongoing') {
-                statusColor = (task.deadline < today) ? 'red' : 'yellow';
-            } else if (task.status === 'Done') {
-                statusColor = 'green';
-            }
+            let statusColor = task.status === 'Done' ? 'green' :
+                task.deadline < today ? 'red' : 'orange';
 
             $tbody.append(`
                 <tr>
@@ -184,41 +249,38 @@ $(document).ready(function () {
                     <td>${task.deadline}</td>
                     <td style="color:${statusColor}; font-weight:bold;">${task.status}</td>
                     <td style="text-align:center;">
-                        <button class="doneTaskBtn" data-id="${task.id}" style="background-color:#4CAF50; color:white; border:none; padding:6px 14px; border-radius:6px; cursor:pointer; margin-right:6px;">Done</button>
-                        <button class="deleteTaskBtn" data-id="${task.id}" style="background-color:#f44336; color:white; border:none; padding:6px 14px; border-radius:6px; cursor:pointer;">Delete</button>
+                        <button class="doneTaskBtn" data-id="${task.id}" style="background-color:#4CAF50;color:white;border:none;padding:6px 14px;border-radius:6px;cursor:pointer;margin-right:6px;">Done</button>
+                        <button class="deleteTaskBtn" data-id="${task.id}" style="background-color:#f44336;color:white;border:none;padding:6px 14px;border-radius:6px;cursor:pointer;">Delete</button>
                     </td>
                 </tr>
             `);
 
             $mobileContainer.append(`
-            <div class="task-card-item" data-id="${task.id}">
-                <h3>${task.activity}</h3>
-                <p><strong>Subject:</strong> ${task.subject}</p>
-                <p><em>Deadline:</em> ${task.deadline}</p>
-                <p><em>Status:</em> <span style="color:${statusColor}; font-weight:bold;">${task.status}</span></p>
-                <div class="card-buttons" style="text-align:center;">
-                    <button class="doneTaskBtn" data-id="${task.id}">Done</button>
-                    <button class="deleteTaskBtn" data-id="${task.id}">Delete</button>
+                <div class="task-card-item" data-id="${task.id}">
+                    <h3>${task.activity}</h3>
+                    <p><strong>Subject:</strong> ${task.subject}</p>
+                    <p><em>Deadline:</em> ${task.deadline}</p>
+                    <p><em>Status:</em> <span style="color:${statusColor}; font-weight:bold;">${task.status}</span></p>
+                    <div class="card-buttons" style="text-align:center;">
+                        <button class="doneTaskBtn" data-id="${task.id}">Done</button>
+                        <button class="deleteTaskBtn" data-id="${task.id}">Delete</button>
+                    </div>
                 </div>
-            </div>
-        `);
+            `);
         });
 
+        // Button events
         $('.doneTaskBtn').off('click').on('click', async function () {
             const id = $(this).data('id');
-            try {
-                await supabase.from('tasks').update({ status: 'Done' }).eq('id', id);
-                loadTasks();
-            } catch (err) { console.error(err); alert('Failed to mark as done.'); }
+            await supabase.from('tasks').update({ status: 'Done' }).eq('id', id);
+            loadTasks();
         });
 
         $('.deleteTaskBtn').off('click').on('click', async function () {
             const id = $(this).data('id');
             if (!confirm('Delete this task?')) return;
-            try {
-                await supabase.from('tasks').delete().eq('id', id);
-                loadTasks();
-            } catch (err) { console.error(err); alert('Failed to delete task.'); }
+            await supabase.from('tasks').delete().eq('id', id);
+            loadTasks();
         });
 
         if (window.innerWidth <= 768) {
@@ -231,4 +293,5 @@ $(document).ready(function () {
     }
 
     $(window).on('resize', loadTasks);
+
 });
