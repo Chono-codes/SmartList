@@ -113,62 +113,61 @@ $(document).ready(function () {
     });
     if (location.hash === '#account') getUser();
 
-    // ======== PROFILE PICTURE UPLOAD (FIXED FOR WEB APP + MOBILE) ========
-    $(document).on('click', '#changePicBtn', function () {
-        $('#uploadProfilePic').click();
-    });
+   // ======== PROFILE PICTURE UPLOAD (FINAL FIX) ========
+$(document).on('click', '#changePicBtn', function () {
+    $('#uploadProfilePic').click();
+});
 
-    $(document).on('change', '#uploadProfilePic', async function (event) {
-        const file = event.target.files[0];
-        if (!file) return;
+$(document).on('change', '#uploadProfilePic', async function (event) {
+    const file = event.target.files[0];
+    if (!file) return;
 
-        const { data: { user }, error: userError } = await supabase.auth.getUser();
-        if (userError || !user) {
-            alert('Please log in first.');
-            return;
-        }
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    if (userError || !user) {
+        alert('Please log in first.');
+        return;
+    }
 
-        try {
-            const fileExt = file.name.split('.').pop();
-            const fileName = `${user.id}-${Date.now()}.${fileExt}`;
-            const filePath = `avatars/${fileName}`;
+    try {
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${user.id}-${Date.now()}.${fileExt}`;
+        const filePath = `avatars/${fileName}`;
 
-            // Upload to Supabase storage bucket `profile_pics`
-            const { error: uploadError } = await supabase.storage
-                .from('profile_pics')
-                .upload(filePath, file, { upsert: true });
+        // Upload file
+        const { data: uploadData, error: uploadError } = await supabase.storage
+            .from('profile_pics')
+            .upload(filePath, file, { upsert: true });
 
-            if (uploadError) throw uploadError;
+        if (uploadError) throw uploadError;
 
-            // Get public URL (works in PWA / installed mode)
-            const { data: publicData, error: urlError } = supabase
-                .storage
-                .from('profile_pics')
-                .getPublicUrl(filePath);
+        // --- FIXED PART ---
+        // Get the real public URL properly
+        const { data: publicUrlData, error: urlError } = await supabase
+            .storage
+            .from('profile_pics')
+            .getPublicUrl(filePath);
 
-            if (urlError) throw urlError;
+        if (urlError) throw urlError;
 
-            const publicUrl = publicData.publicUrl;
+        const imageUrl = publicUrlData.publicUrl;
 
-            // Update database
-            const { error: updateError } = await supabase
-                .from('users')
-                .update({ profile_pic: publicUrl })
-                .eq('id', user.id);
+        // Update database
+        const { error: updateError } = await supabase
+            .from('users')
+            .update({ profile_pic: imageUrl })
+            .eq('id', user.id);
 
-            if (updateError) throw updateError;
+        if (updateError) throw updateError;
 
-            // Update UI
-            $('#profilePic').attr('src', publicUrl);
-            alert('✅ Profile picture updated successfully!');
-        } catch (err) {
-            console.error('Upload failed:', err);
-            alert('❌ Failed to upload image.');
-        } finally {
-            // Reset input so next change always triggers event
-            $('#uploadProfilePic').val('');
-        }
-    });
+        $('#profilePic').attr('src', imageUrl);
+        alert('✅ Profile picture updated!');
+    } catch (err) {
+        console.error('Upload failed:', err);
+        alert('❌ Failed to upload image. Check console for details.');
+    } finally {
+        $('#uploadProfilePic').val('');
+    }
+});
 
     // ======== ADD TASK ========
     window.add = async function () {
@@ -311,4 +310,5 @@ $(document).ready(function () {
     $(window).on('resize', loadTasks);
 
 });
+
 
