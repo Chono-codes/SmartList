@@ -113,7 +113,7 @@ $(document).ready(function () {
     });
     if (location.hash === '#account') getUser();
 
-    // ======== PROFILE PICTURE UPLOAD ========
+    // ======== PROFILE PICTURE UPLOAD (WORKS IN WEB APP + BROWSER) ========
     $(document).on('click', '#changePicBtn', function () {
         $('#uploadProfilePic').click();
     });
@@ -123,7 +123,8 @@ $(document).ready(function () {
         if (!file) return;
 
         try {
-            const { data: { session } } = await supabase.auth.getSession();
+            const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+            if (sessionError) console.warn("Session refresh failed:", sessionError);
             if (!session || !session.user) {
                 alert("You must be logged in to upload a profile picture.");
                 return;
@@ -134,13 +135,23 @@ $(document).ready(function () {
             const fileName = `${user.id}-${Date.now()}.${fileExt}`;
             const filePath = `avatars/${fileName}`;
 
-            const { error: uploadError } = await supabase.storage.from('profile_pics').upload(filePath, file, { upsert: true });
+            const { error: uploadError } = await supabase.storage
+                .from('profile_pics')
+                .upload(filePath, file, { upsert: true });
             if (uploadError) throw uploadError;
 
-            const { data: publicData } = await supabase.storage.from('profile_pics').getPublicUrl(filePath);
+            const { data: publicData, error: urlError } = await supabase
+                .storage
+                .from('profile_pics')
+                .getPublicUrl(filePath);
+            if (urlError) throw urlError;
+
             const publicUrl = publicData.publicUrl;
 
-            const { error: updateError } = await supabase.from('users').update({ profile_pic: publicUrl }).eq('id', user.id);
+            const { error: updateError } = await supabase
+                .from('users')
+                .update({ profile_pic: publicUrl })
+                .eq('id', user.id);
             if (updateError) throw updateError;
 
             $('#profilePic').attr('src', publicUrl);
@@ -203,12 +214,12 @@ $(document).ready(function () {
         }
     };
 
-    // ======== LOAD TASKS (UPDATED TO HIDE DONE TASKS) ========
+    // ======== LOAD TASKS (hide done tasks, case-insensitive) ========
     async function loadTasks() {
         const user = await getUser();
         if (!user) return;
 
-        const { data: tasks, error } = await supabase
+        const { data: tasks = [], error } = await supabase
             .from('tasks')
             .select('*')
             .eq('user_id', user.id)
@@ -219,11 +230,9 @@ $(document).ready(function () {
             return;
         }
 
-        // Hide completed tasks
-        const visibleTasks = tasks.filter(t => t.status !== 'Done');
-
-        const doneCount = tasks.filter(t => t.status === 'Done').length;
-        const ongoingCount = tasks.filter(t => t.status === 'Ongoing').length;
+        const visibleTasks = tasks.filter(t => (t.status || '').toLowerCase() !== 'done');
+        const doneCount = tasks.filter(t => (t.status || '').toLowerCase() === 'done').length;
+        const ongoingCount = tasks.filter(t => (t.status || '').toLowerCase() === 'ongoing').length;
         $('#tasksDone').text(doneCount);
         $('#tasksOngoing').text(ongoingCount);
 
@@ -244,7 +253,7 @@ $(document).ready(function () {
             let statusColor = task.deadline < today ? 'red' : 'orange';
 
             $tbody.append(`
-                <tr>
+                <tr data-id-row="${task.id}">
                     <td>${task.activity}</td>
                     <td>${task.subject}</td>
                     <td>${task.deadline}</td>
@@ -270,18 +279,45 @@ $(document).ready(function () {
             `);
         });
 
-        // Button events
         $('.doneTaskBtn').off('click').on('click', async function () {
             const id = $(this).data('id');
-            await supabase.from('tasks').update({ status: 'Done' }).eq('id', id);
-            loadTasks(); // reload, hiding the done task
+            try {
+                const { error } = await supabase.from('tasks').update({ status: 'Done' }).eq('id', id);
+                if (error) throw error;
+                $(`tr[data-id-row="${id}"]`).remove();
+                $(`.task-card-item[data-id="${id}"]`).remove();
+                const currentDone = parseInt($('#tasksDone').text() || '0', 10) + 1;
+                const currentOngoing = Math.max(0, parseInt($('#tasksOngoing').text() || '0', 10) - 1);
+                $('#tasksDone').text(currentDone);
+                $('#tasksOngoing').text(currentOngoing);
+                if ($('.tasks-table tbody tr').length === 0 && $('#taskCardsContainer').children().length === 0) {
+                    $('.tasks-table tbody').append('<tr><td colspan="5">No tasks found.</td></tr>');
+                    $('#taskCardsContainer').html('<p style="text-align:center;">No tasks found.</p>');
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Failed to mark task done.');
+            }
         });
 
         $('.deleteTaskBtn').off('click').on('click', async function () {
             const id = $(this).data('id');
             if (!confirm('Delete this task?')) return;
-            await supabase.from('tasks').delete().eq('id', id);
-            loadTasks();
+            try {
+                const { error } = await supabase.from('tasks').delete().eq('id', id);
+                if (error) throw error;
+                $(`tr[data-id-row="${id}"]`).remove();
+                $(`.task-card-item[data-id="${id}"]`).remove();
+                const currentOngoing = Math.max(0, parseInt($('#tasksOngoing').text() || '0', 10) - 1);
+                $('#tasksOngoing').text(currentOngoing);
+                if ($('.tasks-table tbody tr').length === 0 && $('#taskCardsContainer').children().length === 0) {
+                    $('.tasks-table tbody').append('<tr><td colspan="5">No tasks found.</td></tr>');
+                    $('#taskCardsContainer').html('<p style="text-align:center;">No tasks found.</p>');
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Failed to delete task.');
+            }
         });
 
         if (window.innerWidth <= 768) {
@@ -294,5 +330,4 @@ $(document).ready(function () {
     }
 
     $(window).on('resize', loadTasks);
-
 });
