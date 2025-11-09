@@ -88,7 +88,7 @@ $(document).ready(function () {
 
     // ======== USER & PROFILE FUNCTIONS ========
     async function getUser() {
-        await supabase.auth.refreshSession(); // ensure valid on mobile
+        await supabase.auth.refreshSession();
         const { data: { user }, error } = await supabase.auth.getUser();
         if (error || !user) {
             $('#userName').text('No user logged in.');
@@ -113,63 +113,45 @@ $(document).ready(function () {
     });
     if (location.hash === '#account') getUser();
 
-  // ======== PROFILE PICTURE UPLOAD (WORKS IN WEB APP + BROWSER) ========
-$(document).on('click', '#changePicBtn', function () {
-    $('#uploadProfilePic').click();
-});
+    // ======== PROFILE PICTURE UPLOAD ========
+    $(document).on('click', '#changePicBtn', function () {
+        $('#uploadProfilePic').click();
+    });
 
-$(document).on('change', '#uploadProfilePic', async function (event) {
-    const file = event.target.files[0];
-    if (!file) return;
+    $(document).on('change', '#uploadProfilePic', async function (event) {
+        const file = event.target.files[0];
+        if (!file) return;
 
-    try {
-        // ✅ Restore or refresh session manually (required for PWA)
-        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-        if (sessionError) console.warn("Session refresh failed:", sessionError);
-        if (!session || !session.user) {
-            alert("You must be logged in to upload a profile picture.");
-            return;
+        try {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session || !session.user) {
+                alert("You must be logged in to upload a profile picture.");
+                return;
+            }
+
+            const user = session.user;
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${user.id}-${Date.now()}.${fileExt}`;
+            const filePath = `avatars/${fileName}`;
+
+            const { error: uploadError } = await supabase.storage.from('profile_pics').upload(filePath, file, { upsert: true });
+            if (uploadError) throw uploadError;
+
+            const { data: publicData } = await supabase.storage.from('profile_pics').getPublicUrl(filePath);
+            const publicUrl = publicData.publicUrl;
+
+            const { error: updateError } = await supabase.from('users').update({ profile_pic: publicUrl }).eq('id', user.id);
+            if (updateError) throw updateError;
+
+            $('#profilePic').attr('src', publicUrl);
+            alert('Profile picture updated successfully!');
+        } catch (err) {
+            console.error("Upload error:", err);
+            alert("Upload failed — session or permission issue.");
+        } finally {
+            $('#uploadProfilePic').val('');
         }
-
-        const user = session.user;
-        const fileExt = file.name.split('.').pop();
-        const fileName = `${user.id}-${Date.now()}.${fileExt}`;
-        const filePath = `avatars/${fileName}`;
-
-        // Upload with authentication
-        const { data: uploadData, error: uploadError } = await supabase.storage
-            .from('profile_pics')
-            .upload(filePath, file, { upsert: true });
-
-        if (uploadError) throw uploadError;
-
-        // Get real public URL
-        const { data: publicData, error: urlError } = await supabase
-            .storage
-            .from('profile_pics')
-            .getPublicUrl(filePath);
-
-        if (urlError) throw urlError;
-
-        const publicUrl = publicData.publicUrl;
-
-        // Update user record
-        const { error: updateError } = await supabase
-            .from('users')
-            .update({ profile_pic: publicUrl })
-            .eq('id', user.id);
-
-        if (updateError) throw updateError;
-
-        $('#profilePic').attr('src', publicUrl);
-        alert('Profile picture updated successfully!');
-    } catch (err) {
-        console.error("Upload error:", err);
-        alert("Upload failed — session or permission issue.");
-    } finally {
-        $('#uploadProfilePic').val('');
-    }
-});
+    });
 
     // ======== ADD TASK ========
     window.add = async function () {
@@ -221,7 +203,7 @@ $(document).on('change', '#uploadProfilePic', async function (event) {
         }
     };
 
-    // ======== LOAD TASKS ========
+    // ======== LOAD TASKS (UPDATED TO HIDE DONE TASKS) ========
     async function loadTasks() {
         const user = await getUser();
         if (!user) return;
@@ -237,6 +219,9 @@ $(document).on('change', '#uploadProfilePic', async function (event) {
             return;
         }
 
+        // Hide completed tasks
+        const visibleTasks = tasks.filter(t => t.status !== 'Done');
+
         const doneCount = tasks.filter(t => t.status === 'Done').length;
         const ongoingCount = tasks.filter(t => t.status === 'Ongoing').length;
         $('#tasksDone').text(doneCount);
@@ -247,7 +232,7 @@ $(document).on('change', '#uploadProfilePic', async function (event) {
         $tbody.empty();
         $mobileContainer.empty();
 
-        if (!tasks.length) {
+        if (!visibleTasks.length) {
             $tbody.append('<tr><td colspan="5">No tasks found.</td></tr>');
             $mobileContainer.html('<p style="text-align:center;">No tasks found.</p>');
             return;
@@ -255,9 +240,8 @@ $(document).on('change', '#uploadProfilePic', async function (event) {
 
         const today = new Date().toISOString().split('T')[0];
 
-        tasks.forEach(task => {
-            let statusColor = task.status === 'Done' ? 'green' :
-                task.deadline < today ? 'red' : 'orange';
+        visibleTasks.forEach(task => {
+            let statusColor = task.deadline < today ? 'red' : 'orange';
 
             $tbody.append(`
                 <tr>
@@ -290,7 +274,7 @@ $(document).on('change', '#uploadProfilePic', async function (event) {
         $('.doneTaskBtn').off('click').on('click', async function () {
             const id = $(this).data('id');
             await supabase.from('tasks').update({ status: 'Done' }).eq('id', id);
-            loadTasks();
+            loadTasks(); // reload, hiding the done task
         });
 
         $('.deleteTaskBtn').off('click').on('click', async function () {
@@ -312,7 +296,3 @@ $(document).on('change', '#uploadProfilePic', async function (event) {
     $(window).on('resize', loadTasks);
 
 });
-
-
-
-
