@@ -1,8 +1,8 @@
 $(document).ready(function () {
 
     // ======== SUPABASE INITIALIZATION ========
-    const SUPABASE_URL = "https://niggfzjuhumefvdhhbms.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5pZ2dmemp1aHVtZWZ2ZGhoYm1zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE2MzYzNjcsImV4cCI6MjA3NzIxMjM2N30.RfYeNCXNzczWU3DrjvZ7MBea4UoTqAIVXIQ03pnG2F0";
+    const SUPABASE_URL = "https://oujuojtsxphzhilteewf.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im91anVvanRzeHBoemhpbHRlZXdmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2NDEyMDksImV4cCI6MjA4MTIxNzIwOX0.HI-9au5liqCGr8t_oYthzAOY5oXeyJqZqS6cPt3chis";
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     // ======== RESTORE SESSION FOR MOBILE SAFETY ========
@@ -331,3 +331,4 @@ $(document).ready(function () {
 
     $(window).on('resize', loadTasks);
 });
+
